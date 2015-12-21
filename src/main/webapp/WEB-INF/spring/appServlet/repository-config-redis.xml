@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="jedisConnFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" p:use-pool="true">
+		<property name="hostName" value="${repositories.engine.host}" />
+		<property name="port" value="${repositories.engine.port}" />
+	</bean>
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory"/>
+	
+	<bean id="archivedStories" class="net.kedean.news.dao.impl.ArchivedStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryRedisImpl">
+				<property name="keyPrefix" value="archived" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="pendingStories" class="net.kedean.news.dao.impl.PendingStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryRedisImpl">
+				<property name="keyPrefix" value="pending" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="publishedStories" class="net.kedean.news.dao.impl.PublishedStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryRedisImpl">
+				<property name="keyPrefix" value="published" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="rejectedStories" class="net.kedean.news.dao.impl.RejectedStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryRedisImpl">
+				<property name="keyPrefix" value="rejected" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="screenshots" class="net.kedean.news.dao.impl.ScreenshotRepositoryRedisImpl" />
+</beans>

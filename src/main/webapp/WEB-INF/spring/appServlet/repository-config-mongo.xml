@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+	
+	<!-- Factory bean that creates the Mongo instance -->
+	<bean id="mongo" class="org.springframework.data.mongodb.core.MongoClientFactoryBean">
+		<property name="host" value="${repositories.engine.host}" />
+		<property name="port" value="${repositories.engine.port}" />
+	</bean>
+	
+	<bean id="mongoDbFactory" class="org.springframework.data.mongodb.core.SimpleMongoDbFactory">
+		<constructor-arg name="mongo" ref="mongo" />
+		<constructor-arg name="databaseName" value="${repositories.engine.db}" />
+	</bean>
+	
+	<bean id="mappingContext"
+		class="org.springframework.data.mongodb.core.mapping.MongoMappingContext" />
+	
+	 <bean id="defaultMongoTypeMapper"
+		class="org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper">
+		<constructor-arg name="typeKey"><null/></constructor-arg>
+	 </bean>
+	
+	 <bean id="mappingMongoConverter"
+		class="org.springframework.data.mongodb.core.convert.MappingMongoConverter">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		<constructor-arg name="mappingContext" ref="mappingContext" />
+		<property name="typeMapper" ref="defaultMongoTypeMapper" />
+	 </bean>
+	
+	<!-- MongoTemplate for connecting and quering the documents in the database -->
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		<constructor-arg name="mongoConverter" ref="mappingMongoConverter" />
+	</bean>
+		
+	<bean id="archivedStories" class="net.kedean.news.dao.impl.ArchivedStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryMongoImpl">
+				<property name="collectionName" value="archived" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="pendingStories" class="net.kedean.news.dao.impl.PendingStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryMongoImpl">
+				<property name="collectionName" value="pending" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="publishedStories" class="net.kedean.news.dao.impl.PublishedStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryMongoImpl">
+				<property name="collectionName" value="published" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="rejectedStories" class="net.kedean.news.dao.impl.RejectedStoryRepositoryImpl">
+		<property name="internalRepo">
+			<bean class="net.kedean.news.dao.impl.StoryRepositoryMongoImpl">
+				<property name="collectionName" value="rejected" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="screenshots" class="net.kedean.news.dao.impl.ScreenshotRepositoryMongoImpl" />
+</beans>
