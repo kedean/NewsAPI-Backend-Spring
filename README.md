@@ -1,6 +1,8 @@
 Spring Backend
 ==========
 
+[![Build Status](https://travis-ci.org/kedean/NewsAPI-Backend-Spring.svg)](https://travis-ci.org/kedean/NewsAPI-Backend-Spring)
+
 Backend for the NewsAPI system built using SpringMVC.
 
 ##Data backing
